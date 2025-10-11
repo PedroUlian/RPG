@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Mensagens</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>Mensagens</header>
+    <nav>
+        <a href="index.html">Menu</a>
+        <a href="personagem.html">Personagem</a>
+        <a href="historia.html">História</a>
+        <a href="ficha.html">Ficha</a>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            <h3>Chat RPG</h3>
+
+            <!-- usuário logado / sair -->
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;">
+              <div id="user-info" style="font-size:14px;color:#ccc;">Usuário: —</div>
+              <div style="display:flex; gap:8px;">
+                <button id="logout-btn" class="clear-btn" style="background-color:#555;">🚪 Sair</button>
+                <button id="clear-btn" class="clear-btn">🧹 Limpar histórico</button>
+              </div>
+            </div>
+
+            <!-- chat -->
+            <div id="chat-box" class="chat-box">
+                <p style="color:#888;">Carregando mensagens...</p>
+            </div>
+
+            <!-- entrada -->
+            <div class="chat-input">
+                <input id="chat-input" type="text" placeholder="Digite sua mensagem..." autocomplete="off">
+                <button id="send-btn">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

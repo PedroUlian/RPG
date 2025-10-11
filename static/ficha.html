@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Ficha do Personagem</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>Ficha do Personagem</header>
+<nav>
+    <a href="index.html">Menu</a>
+    <a href="personagem.html">Personagem</a>
+    <a href="historia.html">História</a>
+    <a href="mensagens.html">Mensagens</a>
+</nav>
+<div class="container">
+  <div class="card" style="max-width:500px; margin:auto;">
+    <h3>Preencha sua Ficha</h3>
+
+    <input id="nome" type="text" placeholder="Nome do personagem">
+    <input id="classe" type="text" placeholder="Classe">
+    <input id="raca" type="text" placeholder="Raça">
+    <button id="save-btn">Salvar Ficha</button>
+    <p id="msg" style="color:#f88;"></p>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const username = localStorage.getItem("username");
+  if (!username) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const fields = ["nome","classe","raca"];
+  const msg = document.getElementById("msg");
+
+  // salvar ficha
+  document.getElementById("save-btn").addEventListener("click", async () => {
+    const data = { username };
+    fields.forEach(f => {
+        data[f] = document.getElementById(f).value;
+    });
+
+    // aviso de sobrescrever
+    const overwrite = confirm("Se você já tiver uma ficha, ela será sobrescrita. Deseja continuar?");
+    if (!overwrite) return; // se cancelou, não envia
+
+    try {
+        const res = await fetch("/save_sheet", {
+        method: "POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (result.status === "ok") {
+        msg.style.color = "green";
+        msg.textContent = "Ficha salva com sucesso!";
+        } else {
+        msg.style.color = "red";
+        msg.textContent = result.error || "Erro ao salvar.";
+        }
+    } catch(err) {
+        msg.style.color = "red";
+        msg.textContent = "Erro de conexão.";
+        console.error(err);
+    }
+    });
+
+});
+</script>
+</body>
+</html>

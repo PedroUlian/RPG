@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Entrar no RPG</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>Login / Registro</header>
+  <div class="container">
+    <div class="card" style="max-width:420px; margin:auto;">
+      <h2>Entrar no RPG</h2>
+
+      <label for="username">Usuário</label>
+      <input id="username" type="text" placeholder="Nome de usuário">
+
+      <label for="password">Senha</label>
+      <input id="password" type="password" placeholder="Senha">
+
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button id="login-btn">Entrar</button>
+        <button id="register-btn" class="secondary">Registrar</button>
+      </div>
+
+      <p id="msg" style="color:#f88; margin-top:10px;"></p>
+    </div>
+  </div>
+
+  <script>
+    async function submitAuth(route) {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const msg = document.getElementById("msg");
+      msg.textContent = "";
+
+      if (!username || !password) {
+        msg.textContent = "Preencha todos os campos.";
+        return;
+      }
+
+      try {
+        const res = await fetch(`/${route}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.status === "ok") {
+          localStorage.setItem("username", username);
+          window.location.href = "mensagens.html";
+        } else {
+          msg.textContent = data.error || "Erro no servidor.";
+        }
+      } catch (err) {
+        msg.textContent = "Erro de conexão.";
+        console.error(err);
+      }
+    }
+
+    document.getElementById("login-btn").addEventListener("click", () => submitAuth("login"));
+    document.getElementById("register-btn").addEventListener("click", () => submitAuth("register"));
+
+    // permite Enter no campo senha
+    document.getElementById("password").addEventListener("keypress", (e) => {
+      if (e.key === "Enter") document.getElementById("login-btn").click();
+    });
+  </script>
+</body>
+</html>
