@@ -5,8 +5,8 @@
   "start_url": "/",
   "display": "fullscreen",
   "orientation": "portrait",
+  "theme_color": "#2C2C2C",
   "background_color": "#1E1E1E",
-  "theme_color": "#6A0DAD",
   "scope": "/",
   "prefer_related_applications": false,
   "icons": [
