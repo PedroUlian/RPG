@@ -3,11 +3,12 @@
   "short_name": "SolarKindom",
   "description": "Explore o universo de SolarKindom — um reino moderno com estilo elegante em tons de cinza e roxo.",
   "start_url": "/",
-  "display": "standalone",
+  "display": "fullscreen",
+  "orientation": "portrait",
   "background_color": "#1E1E1E",
   "theme_color": "#6A0DAD",
-  "orientation": "portrait",
   "scope": "/",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
