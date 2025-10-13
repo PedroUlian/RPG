@@ -109,7 +109,7 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/save_sheet", async (req, res) => {
-  const { username, nome, classe, raca } = req.body;
+  const { username, nome, classe, raca, descricao } = req.body;
   try {
     const userResult = await pool.query("SELECT id FROM users WHERE username=$1", [username]);
     if (userResult.rows.length === 0) return res.status(400).json({ error: "Usuário não encontrado" });
