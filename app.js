@@ -116,13 +116,14 @@ app.post("/save_sheet", async (req, res) => {
     const user_id = userResult.rows[0].id;
 
     await pool.query(`
-      INSERT INTO character_sheet (user_id, nome, classe, raca)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO character_sheet (user_id, nome, classe, raca, descricao)
+      VALUES ($1, $2, $3, $4, $5)
       ON CONFLICT (user_id) DO UPDATE SET
         nome = $2,
         classe = $3,
-        raca = $4
-    `, [user_id, nome, classe, raca]);
+        raca = $4,
+        descricao = $5
+    `, [user_id, nome, classe, raca, descricao]);
 
     res.json({ status: "ok" });
   } catch(err) {
