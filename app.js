@@ -81,17 +81,18 @@ app.post("/clear_history", async (req, res) => {
 
 // Registro de usuário
 app.post("/register", async (req, res) => {
-  const { username, password, isadmin } = req.body;
+  const { username, password } = req.body;
   try {
     const result = await pool.query(
-      "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id",
-      [username, password, isadmin]
+      "INSERT INTO users (username, password, isadmin) VALUES ($1, $2, false) RETURNING id",
+      [username, password]
     );
-    res.json({ status: "ok", user_id: result.rows[0].id });
+    res.json({ status: "ok", user_id: result.rows[0].id, isadmin: false });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 });
+
 
 // Login de usuário
 app.post("/login", async (req, res) => {
