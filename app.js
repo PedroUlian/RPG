@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
 import OpenAI from "openai";
+import fetch from "node-fetch";
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
@@ -218,15 +219,23 @@ app.post("/chat", async (req, res) => {
   if (!message) return res.status(400).json({ error: "Mensagem ausente" });
 
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: message }]
+    const response = await fetch("https://api-inference.huggingface.co/models/gpt2", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.HF_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ inputs: message })
     });
 
-    res.json({ reply: response.choices[0].message.content });
+    const data = await response.json();
+    // Para gpt2, a resposta vem em data[0].generated_text
+    const reply = data[0]?.generated_text || "Sem resposta";
+
+    res.json({ reply });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Erro na API da OpenAI" });
+    res.status(500).json({ error: "Erro na IA Hugging Face" });
   }
 });
 
