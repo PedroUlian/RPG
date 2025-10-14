@@ -180,6 +180,33 @@ app.get("/get_all_sheets", async (req, res) => {
   }
 });
 
+// Pegar história
+app.get("/get_historia", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT conteudo FROM historia LIMIT 1");
+    if (result.rows.length === 0)
+      return res.json({ conteudo: "" });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error("Erro ao buscar história:", err.message);
+    res.status(500).json({ error: "Erro ao buscar história" });
+  }
+});
+
+// Salvar/editar história (apenas admin)
+app.post("/save_historia", async (req, res) => {
+  const { conteudo } = req.body;
+  try {
+    await pool.query(`
+      UPDATE historia SET conteudo=$1 WHERE id=1;
+    `, [conteudo]);
+    res.json({ status: "ok" });
+  } catch (err) {
+    console.error("Erro ao salvar história:", err.message);
+    res.status(500).json({ error: "Erro ao salvar história" });
+  }
+});
+
 
 // SocketIO
 io.on("connection", (socket) => {
