@@ -98,15 +98,27 @@ app.post("/login", async (req, res) => {
   const { username, password } = req.body;
   try {
     const result = await pool.query(
-      "SELECT id FROM users WHERE username=$1 AND password=$2",
+      "SELECT id, admin FROM users WHERE username=$1 AND password=$2",
       [username, password]
     );
-    if (result.rows.length === 0) return res.status(401).json({ error: "Usuário ou senha inválidos" });
-    res.json({ status: "ok", user_id: result.rows[0].id });
+
+    if (result.rows.length === 0) 
+      return res.status(401).json({ error: "Usuário ou senha inválidos" });
+
+    const user = result.rows[0];
+
+    // retorna id e admin
+    res.json({ 
+      status: "ok", 
+      user_id: user.id, 
+      isAdmin: user.admin // boolean
+    });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 app.post("/save_sheet", async (req, res) => {
   const { username, nome, classe, raca, descricao } = req.body;
