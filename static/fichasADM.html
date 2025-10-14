@@ -9,10 +9,8 @@
 <body>
 <header>Admin - Todas as Fichas</header>
 <nav>
-    <a href="index.html">Menu</a>
-    <a href="ficha.html">Ficha</a>
-    <a href="historia.html">História</a>
-    <a href="mensagens.html">Mensagens</a>
+    <a href="admin.html">Admin Panel</a>
+    <a href="historiaADM.html">Editar historia</a>
 </nav>
 
 <div class="container">
@@ -63,7 +61,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p><strong>Inteligência:</strong> ${f.inteligencia || 0}</p>
         <p><strong>Mana:</strong> ${f.mana || 0}</p>
         <p><strong>Descrição:</strong> ${f.descricao || "-"}</p>
-        <button onclick="abrirHistoria('${f.username}')">Editar História</button>
       </div>
     `).join("");
 
@@ -72,11 +69,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     sheetDiv.innerHTML = "<p>Erro ao carregar fichas.</p>";
   }
 });
-
-function abrirHistoria(username) {
-  localStorage.setItem("selectedUser", username);
-  window.location.href = "historia.html";
-}
 </script>
 </body>
 </html>
