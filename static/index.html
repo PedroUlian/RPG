@@ -5,16 +5,21 @@
     <meta charset="UTF-8">
     <title>RPG - Menu</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="manifest" href="manifest.json"
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <header>RPG Online</header>
+    <header>
+        RPG Online
+        <button id="btnExtra">Função+</button>
+    </header>
+
     <nav>
         <a href="personagem.html">Personagem</a>
         <a href="mensagens.html">Mensagens</a>
         <a href="historia.html">História</a>
         <a href="ficha.html">Ficha</a>
     </nav>
+
     <div class="container">
         <h2>Bem-vindo ao RPG!</h2>
         <p>Escolha uma opção no menu para começar a jogar ou configurar seu personagem.</p>
@@ -28,6 +33,11 @@
             <p style="font-size:0.9em;color:#ccc">Desenvolvido para teste local — lembre de rodar o servidor (node app.js).</p>
         </div>
     </div>
+
+    <script>
+        document.getElementById("btnExtra").addEventListener("click", () => {
+            alert("Nova função ainda será adicionada aqui!");
+        });
+    </script>
 </body>
 </html>
-
