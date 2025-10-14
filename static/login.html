@@ -49,6 +49,7 @@
 
         if (res.ok && data.status === "ok") {
           localStorage.setItem("username", username);
+          localStorage.setItem("isAdmin", data.isAdmin ? "true" : "false");
           window.location.href = "mensagens.html";
         } else {
           msg.textContent = data.error || "Erro no servidor.";
@@ -69,3 +70,4 @@
   </script>
 </body>
 </html>
+
