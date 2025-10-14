@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Todas as Fichas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>Admin - Todas as Fichas</header>
+<nav>
+    <a href="index.html">Menu</a>
+    <a href="ficha.html">Ficha</a>
+    <a href="historia.html">História</a>
+    <a href="mensagens.html">Mensagens</a>
+</nav>
+
+<div class="container">
+  <div class="card" style="max-width:800px; margin:auto;">
+    <h3>Lista de Fichas</h3>
+    <div id="sheet">
+      <p>Carregando fichas...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const username = localStorage.getItem("username");
+  const isAdmin = localStorage.getItem("isAdmin"); // você define isso no login
+  
+  if (!username) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  if (isAdmin !== "true") {
+    alert("Acesso restrito ao administrador.");
+    window.location.href = "index.html";
+    return;
+  }
+
+  const sheetDiv = document.getElementById("sheet");
+  try {
+    const res = await fetch("/get_all_sheets");
+    const data = await res.json();
+
+    if (!Array.isArray(data) || data.length === 0) {
+      sheetDiv.innerHTML = "<p>Nenhuma ficha encontrada.</p>";
+      return;
+    }
+
+    // Gera a lista de fichas
+    sheetDiv.innerHTML = data.map(f => `
+      <div class="ficha-card" style="border:1px solid #666; padding:10px; margin:10px; border-radius:10px;">
+        <p><strong>Jogador:</strong> ${f.username}</p>
+        <p><strong>Nome:</strong> ${f.nome || "-"}</p>
+        <p><strong>Classe:</strong> ${f.classe || "-"}</p>
+        <p><strong>Raça:</strong> ${f.raca || "-"}</p>
+        <p><strong>Nível:</strong> ${f.nivel || 0}</p>
+        <p><strong>Força:</strong> ${f.forca || 0}</p>
+        <p><strong>Velocidade:</strong> ${f.velocidade || 0}</p>
+        <p><strong>Inteligência:</strong> ${f.inteligencia || 0}</p>
+        <p><strong>Mana:</strong> ${f.mana || 0}</p>
+        <p><strong>Descrição:</strong> ${f.descricao || "-"}</p>
+        <button onclick="abrirHistoria('${f.username}')">Editar História</button>
+      </div>
+    `).join("");
+
+  } catch(err) {
+    console.error(err);
+    sheetDiv.innerHTML = "<p>Erro ao carregar fichas.</p>";
+  }
+});
+
+function abrirHistoria(username) {
+  localStorage.setItem("selectedUser", username);
+  window.location.href = "historia.html";
+}
+</script>
+</body>
+</html>
