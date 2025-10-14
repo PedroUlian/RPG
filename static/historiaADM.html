@@ -1,73 +1,102 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
   <title>Editar História</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    #editor {
+      min-height: 300px;
+      border: 1px solid #666;
+      padding: 10px;
+      border-radius: 5px;
+      background: #1e1e2f;
+      color: #eee;
+      overflow-y: auto;
+    }
+    #toolbar button {
+      margin-right: 5px;
+    }
+  </style>
 </head>
 <body>
-<header>Admin - Editar História</header>
-
+<header>Admin - Editor de História</header>
 <nav>
-  <a href="admin.html">Admin Panel</a>
-  <a href="fichasADM.html">Fichas</a>
+  <a href="admin.html">Menu</a>
 </nav>
 
 <div class="container">
-  <div class="card" style="max-width:800px; margin:auto;">
-    <h3>Editar História</h3>
-    <textarea id="historia" rows="15" style="width:100%; resize:none;"></textarea>
-    <button id="salvar" style="margin-top:10px;">Salvar Alterações</button>
-    <p id="msg" style="margin-top:10px; color:#9f9;"></p>
+  <h3>Editor da História</h3>
+
+  <div id="toolbar">
+    <button onclick="execCmd('bold')"><b>B</b></button>
+    <button onclick="execCmd('italic')"><i>I</i></button>
+    <button onclick="execCmd('underline')"><u>U</u></button>
+    <button onclick="execCmd('insertUnorderedList')">&bull; Lista</button>
+    <button onclick="execCmd('insertOrderedList')">1. Lista</button>
+    <input type="color" onchange="execCmd('foreColor', this.value)">
+    <button onclick="salvarHistoria()">Salvar</button>
+  </div>
+
+  <div id="editor" contenteditable="true">
+    Carregando história...
   </div>
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", async () => {
+  const username = localStorage.getItem("username");
   const isadmin = localStorage.getItem("isadmin");
-  if (isadmin !== "true") {
+
+  if(!username) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  if(isadmin !== "true") {
     alert("Acesso restrito ao administrador.");
     window.location.href = "index.html";
     return;
   }
 
-  const historiaBox = document.getElementById("historia");
-  const msg = document.getElementById("msg");
-
-  // Carregar conteúdo atual
+  // Carregar conteúdo da história
+  const editor = document.getElementById("editor");
   try {
     const res = await fetch("/get_historia");
     const data = await res.json();
-    historiaBox.value = data.conteudo || "";
-  } catch (err) {
-    historiaBox.value = "Erro ao carregar história.";
+    editor.innerHTML = data.conteudo || "<p>Insira o conteúdo da história aqui...</p>";
+  } catch(err) {
+    console.error(err);
+    editor.innerHTML = "<p>Erro ao carregar história.</p>";
   }
-
-  // Salvar
-  document.getElementById("salvar").addEventListener("click", async () => {
-    const conteudo = historiaBox.value.trim();
-    msg.textContent = "";
-    try {
-      const res = await fetch("/save_historia", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ conteudo })
-      });
-      const data = await res.json();
-      if (data.status === "ok") {
-        msg.style.color = "#9f9";
-        msg.textContent = "História salva com sucesso!";
-      } else {
-        msg.style.color = "#f88";
-        msg.textContent = "Erro ao salvar.";
-      }
-    } catch (err) {
-      msg.style.color = "#f88";
-      msg.textContent = "Erro de conexão.";
-    }
-  });
 });
+
+// Função de formatação
+function execCmd(command, value=null){
+  document.execCommand(command, false, value);
+}
+
+// Salvar história no banco
+async function salvarHistoria(){
+  const editor = document.getElementById("editor");
+  try {
+    const res = await fetch("/save_historia", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ conteudo: editor.innerHTML })
+    });
+    const data = await res.json();
+    if(data.status === "ok") {
+      alert("História salva com sucesso!");
+    } else {
+      alert("Erro ao salvar história.");
+    }
+  } catch(err) {
+    console.error(err);
+    alert("Erro de conexão ao salvar história.");
+  }
+}
 </script>
 </body>
 </html>
