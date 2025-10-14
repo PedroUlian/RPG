@@ -114,3 +114,23 @@ button:hover {
   padding: 8px 12px;
   cursor: pointer;
 }
+
+/* Botão do canto superior direito */
+#btnExtra {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: #4b0082;
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+#btnExtra:hover {
+    background-color: #6a0dad;
+    transform: scale(1.05);
+}
