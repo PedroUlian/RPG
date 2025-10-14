@@ -24,5 +24,24 @@
             <p style="font-size:0.9em;color:#ccc">Desenvolvido para teste local — lembre de rodar o servidor (node app.js).</p>
         </div>
     </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const username = localStorage.getItem("username");
+        const isAdmin = localStorage.getItem("isAdmin"); // você define isso no login
+        
+        if (!username) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        if (isAdmin !== "true") {
+            alert("Acesso restrito ao administrador.");
+            window.location.href = "index.html";
+            return;
+        }
+    });
+    </script> 
+
 </body>
 </html>
