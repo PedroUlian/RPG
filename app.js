@@ -111,7 +111,7 @@ app.post("/login", async (req, res) => {
     res.json({ 
       status: "ok", 
       user_id: user.id, 
-      isAdmin: user.IsAdmin // boolean
+      isAdmin: user.isadmin // boolean
     });
 
   } catch (err) {
