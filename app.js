@@ -81,11 +81,11 @@ app.post("/clear_history", async (req, res) => {
 
 // Registro de usuário
 app.post("/register", async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, isadmin } = req.body;
   try {
     const result = await pool.query(
       "INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id",
-      [username, password]
+      [username, password, isadmin]
     );
     res.json({ status: "ok", user_id: result.rows[0].id });
   } catch (err) {
@@ -95,11 +95,11 @@ app.post("/register", async (req, res) => {
 
 // Login de usuário
 app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, isadmin } = req.body;
   try {
     const result = await pool.query(
       "SELECT id, admin FROM users WHERE username=$1 AND password=$2",
-      [username, password]
+      [username, password, isadmin]
     );
 
     if (result.rows.length === 0) 
