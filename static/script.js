@@ -73,18 +73,39 @@ document.addEventListener("DOMContentLoaded", async () => {
       .replace(/'/g, "&#039;");
   }
 
-  sendBtn.addEventListener("click", () => {
+
+sendBtn.addEventListener("click", async () => {
   const text = chatInput.value.trim();
   if (text === "") return;
 
-  socket.emit("message", { user: username, text });
+  // Se começar com @IA
+  if (text.startsWith("@IA")) {
+    const comando = text.slice(3).trim(); // remove "@IA" e espaços
 
-  // se mensagem começa com @IA
-  if (text.toLowerCase().startsWith("@ia")) {
-    socket.emit("ai_message", text.slice(3).trim()); // envia apenas o texto depois de @IA
+    // mostra a mensagem do usuário no chat
+    addMessage(username, text);
+    chatInput.value = "";
+
+    try {
+      const res = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: comando })
+      });
+      const data = await res.json();
+      if (data.reply) {
+        addMessage("IA", data.reply); // adiciona a resposta da IA
+      }
+    } catch (err) {
+      console.error("Erro ao chamar IA:", err);
+      addMessage("IA", "❌ Erro ao processar comando.");
+    }
+
+  } else {
+    // mensagem normal para o chat
+    socket.emit("message", { user: username, text });
+    chatInput.value = "";
   }
-
-  chatInput.value = "";
 });
 
   chatInput.addEventListener("keypress", (e) => {
