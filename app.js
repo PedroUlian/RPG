@@ -6,6 +6,7 @@ import pg from "pg";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import OpenAI from "openai";
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
@@ -14,6 +15,10 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "static"))); // pasta static igual testMain
@@ -204,6 +209,24 @@ app.post("/save_historia", async (req, res) => {
   } catch (err) {
     console.error("Erro ao salvar história:", err.message);
     res.status(500).json({ error: "Erro ao salvar história" });
+  }
+});
+
+// 🔹 Rota de chat com IA
+app.post("/chat", async (req, res) => {
+  const { message } = req.body;
+  if (!message) return res.status(400).json({ error: "Mensagem ausente" });
+
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [{ role: "user", content: message }]
+    });
+
+    res.json({ reply: response.choices[0].message.content });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro na API da OpenAI" });
   }
 });
 
