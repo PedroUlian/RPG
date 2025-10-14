@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar História</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>Admin - Editar História</header>
+
+<nav>
+  <a href="index.html">Menu</a>
+  <a href="fichasADM.html">Fichas</a>
+  <a href="mensagens.html">Mensagens</a>
+</nav>
+
+<div class="container">
+  <div class="card" style="max-width:800px; margin:auto;">
+    <h3>Editar História</h3>
+    <textarea id="historia" rows="15" style="width:100%; resize:none;"></textarea>
+    <button id="salvar" style="margin-top:10px;">Salvar Alterações</button>
+    <p id="msg" style="margin-top:10px; color:#9f9;"></p>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const isadmin = localStorage.getItem("isadmin");
+  if (isadmin !== "true") {
+    alert("Acesso restrito ao administrador.");
+    window.location.href = "index.html";
+    return;
+  }
+
+  const historiaBox = document.getElementById("historia");
+  const msg = document.getElementById("msg");
+
+  // Carregar conteúdo atual
+  try {
+    const res = await fetch("/get_historia");
+    const data = await res.json();
+    historiaBox.value = data.conteudo || "";
+  } catch (err) {
+    historiaBox.value = "Erro ao carregar história.";
+  }
+
+  // Salvar
+  document.getElementById("salvar").addEventListener("click", async () => {
+    const conteudo = historiaBox.value.trim();
+    msg.textContent = "";
+    try {
+      const res = await fetch("/save_historia", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ conteudo })
+      });
+      const data = await res.json();
+      if (data.status === "ok") {
+        msg.style.color = "#9f9";
+        msg.textContent = "História salva com sucesso!";
+      } else {
+        msg.style.color = "#f88";
+        msg.textContent = "Erro ao salvar.";
+      }
+    } catch (err) {
+      msg.style.color = "#f88";
+      msg.textContent = "Erro de conexão.";
+    }
+  });
+});
+</script>
+</body>
+</html>
