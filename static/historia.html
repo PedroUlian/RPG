@@ -16,9 +16,26 @@
     </nav>
     <div class="container">
         <div class="card">
-            <h3>AINDA NÃO ADICIONADO!</h3>
+            <h3>História do RPG</h3>
+            <!-- Aqui vamos colocar o conteúdo do banco -->
+            <div id="texto-historia">
+                Carregando história...
+            </div>
         </div>
     </div>
-</body>
 
+    <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+        const historiaDiv = document.getElementById("texto-historia");
+        try {
+            const res = await fetch("/get_historia"); // chama a rota do server
+            const data = await res.json();
+            historiaDiv.innerText = data.conteudo || "Nenhuma história definida ainda.";
+        } catch (err) {
+            console.error(err);
+            historiaDiv.innerText = "Erro ao carregar a história.";
+        }
+    });
+    </script>
+</body>
 </html>
