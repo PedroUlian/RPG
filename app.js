@@ -112,7 +112,7 @@ app.post("/login", async (req, res) => {
     res.json({ 
       status: "ok", 
       user_id: user.id, 
-      isadmin: user.isadmin // boolean
+      isadmin: !!user.isadmin // boolean
     });
 
   } catch (err) {
