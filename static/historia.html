@@ -1,41 +1,49 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
-    <title>História</title>
-    <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>História</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .historia-container {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+      background-color: #1e1e2f;
+      color: #eee;
+      border-radius: 10px;
+    }
+  </style>
 </head>
 <body>
-    <header>História do RPG</header>
-    <nav>
-        <a href="index.html">Menu</a>
-        <a href="personagem.html">Personagem</a>
-        <a href="mensagens.html">Mensagens</a>
-        <a href="ficha.html">Ficha</a>
-    </nav>
-    <div class="container">
-        <div class="card">
-            <h3>História do RPG</h3>
-            <!-- Aqui vamos colocar o conteúdo do banco -->
-            <div id="texto-historia">
-                Carregando história...
-            </div>
-        </div>
-    </div>
+<header>História do RPG</header>
+<nav>
+  <a href="index.html">Menu</a>
+  <a href="personagem.html">Personagem</a>
+  <a href="mensagens.html">Mensagens</a>
+  <a href="ficha.html">Ficha</a>
+</nav>
 
-    <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-        const historiaDiv = document.getElementById("texto-historia");
-        try {
-            const res = await fetch("/get_historia"); // chama a rota do server
-            const data = await res.json();
-            historiaDiv.innerText = data.conteudo || "Nenhuma história definida ainda.";
-        } catch (err) {
-            console.error(err);
-            historiaDiv.innerText = "Erro ao carregar a história.";
-        }
-    });
-    </script>
+<div class="container historia-container" id="historia">
+  Carregando história...
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+  const historiaDiv = document.getElementById("historia");
+
+  try {
+    const res = await fetch("/get_historia");
+    const data = await res.json();
+
+    // Aqui colocamos o HTML direto, para interpretar as tags
+    historiaDiv.innerHTML = data.conteudo || "<p>História ainda não adicionada.</p>";
+  } catch(err) {
+    console.error(err);
+    historiaDiv.innerHTML = "<p>Erro ao carregar história.</p>";
+  }
+});
+</script>
 </body>
 </html>
