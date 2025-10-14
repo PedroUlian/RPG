@@ -219,19 +219,22 @@ app.post("/chat", async (req, res) => {
   if (!message) return res.status(400).json({ error: "Mensagem ausente" });
 
   try {
-    const response = await fetch("https://api-inference.huggingface.co/models/gpt2", {
+    const response = await fetch("https://api-inference.huggingface.co/models/distilgpt2", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.HF_API_KEY}`,
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ inputs: message })
+      body: JSON.stringify({ 
+        inputs: message,
+        parameters: { max_new_tokens: 50 }
+      })
     });
 
     const data = await response.json();
-    // Para gpt2, a resposta vem em data[0].generated_text
-    const reply = data[0]?.generated_text || "Sem resposta";
+    console.log(data); // útil para ver a estrutura retornada
 
+    const reply = data[0]?.generated_text || "Sem resposta";
     res.json({ reply });
   } catch (err) {
     console.error(err);
