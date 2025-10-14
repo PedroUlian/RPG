@@ -74,11 +74,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   sendBtn.addEventListener("click", () => {
-    const text = chatInput.value.trim();
-    if (text === "") return;
-    socket.emit("message", { user: username, text });
-    chatInput.value = "";
-  });
+  const text = chatInput.value.trim();
+  if (text === "") return;
+
+  socket.emit("message", { user: username, text });
+
+  // se mensagem começa com @IA
+  if (text.toLowerCase().startsWith("@ia")) {
+    socket.emit("ai_message", text.slice(3).trim()); // envia apenas o texto depois de @IA
+  }
+
+  chatInput.value = "";
+});
 
   chatInput.addEventListener("keypress", (e) => {
     if (e.key === "Enter") sendBtn.click();
