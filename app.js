@@ -164,6 +164,22 @@ app.get("/get_sheet/:username", async (req,res) => {
   }
 });
 
+// Rota para o admin ver todas as fichas
+app.get("/get_all_sheets", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT u.username, c.nome, c.classe, c.raca, c.nivel, c.forca, c.velocidade, 
+             c.inteligencia, c.mana, c.descricao
+      FROM character_sheet c
+      JOIN users u ON u.id = c.user_id
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Erro ao buscar fichas:", err.message);
+    res.status(500).json({ error: "Erro ao buscar fichas" });
+  }
+});
+
 
 // SocketIO
 io.on("connection", (socket) => {
