@@ -100,7 +100,7 @@ app.post("/login", async (req, res) => {
   try {
     const result = await pool.query(
       "SELECT id, isadmin FROM users WHERE username=$1 AND password=$2",
-      [username, password, isadmin]
+      [username, password]
     );
 
     if (result.rows.length === 0) 
