@@ -213,33 +213,47 @@ app.post("/save_historia", async (req, res) => {
   }
 });
 
-// 🔹 Rota de chat com IA
+async function query(data) {
+	const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
+		headers: {
+			Authorization: `Bearer ${process.env.HF_API_KEY}`,
+			"Content-Type": "application/json",
+		},
+		method: "POST",
+		body: JSON.stringify(data),
+	});
+
+	const result = await response.json();
+	return result;
+}
+
 app.post("/chat", async (req, res) => {
-  const { message } = req.body;
-  if (!message) return res.status(400).json({ error: "Mensagem ausente" });
+	try {
+		const { message } = req.body;
 
-  try {
-    const response = await fetch("https://api-inference.huggingface.co/models/distilgpt2", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.HF_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ 
-        inputs: message,
-        parameters: { max_new_tokens: 50 }
-      })
-    });
+		if (!message) {
+			return res.status(400).json({ error: "Mensagem não fornecida" });
+		}
 
-    const data = await response.json();
-    console.log(data); // útil para ver a estrutura retornada
+		const resposta = await query({
+			messages: [
+				{ role: "user", content: message },
+			],
+			model: "deepseek-ai/DeepSeek-V3.2-Exp:novita",
+		});
 
-    const reply = data[0]?.generated_text || "Sem resposta";
-    res.json({ reply });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erro na IA Hugging Face" });
-  }
+		if (resposta.error) {
+			console.error("Erro do modelo:", resposta.error);
+			return res.status(500).json({ error: resposta.error });
+		}
+
+		const conteudo = resposta.choices?.[0]?.message?.content || "Sem resposta do modelo.";
+		res.json({ reply: conteudo });
+
+	} catch (err) {
+		console.error("Erro no /chat:", err);
+		res.status(500).json({ error: "Erro interno no servidor" });
+	}
 });
 
 
