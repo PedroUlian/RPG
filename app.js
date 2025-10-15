@@ -234,10 +234,12 @@ app.post("/chat", async (req, res) => {
 		if (!message) {
 			return res.status(400).json({ error: "Mensagem não fornecida" });
 		}
+  
+  let MsgFinal = "(responda de forma direta e em português) " + massage
 
 		const resposta = await query({
 			messages: [
-				{ role: "user", content: "Você é uma IA que responde sempre em português brasileiro e de forma direta" },
+				{ role: "user", content: MsgFinal },
 			],
 			model: "meta-llama/Llama-3.1-8B-Instruct",
 		});
