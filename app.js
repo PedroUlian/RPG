@@ -6,6 +6,8 @@ import pg from "pg";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import OpenAI from "openai";
+import fetch from "node-fetch";
 
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
@@ -14,6 +16,10 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "static"))); // pasta static igual testMain
@@ -205,6 +211,51 @@ app.post("/save_historia", async (req, res) => {
     console.error("Erro ao salvar história:", err.message);
     res.status(500).json({ error: "Erro ao salvar história" });
   }
+});
+
+async function query(data) {
+	const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
+		headers: {
+			Authorization: `Bearer ${process.env.HF_API_KEY}`,
+			"Content-Type": "application/json",
+		},
+		method: "POST",
+		body: JSON.stringify(data),
+	});
+
+	const result = await response.json();
+	return result;
+}
+
+app.post("/chat", async (req, res) => {
+	try {
+		const { message } = req.body;
+
+		if (!message) {
+			return res.status(400).json({ error: "Mensagem não fornecida" });
+		}
+  
+  let MsgFinal = "(responda de forma direta e em português) " + message
+
+		const resposta = await query({
+			messages: [
+				{ role: "user", content: MsgFinal },
+			],
+			model: "meta-llama/Llama-3.1-8B-Instruct",
+		});
+
+		if (resposta.error) {
+			console.error("Erro do modelo:", resposta.error);
+			return res.status(500).json({ error: resposta.error });
+		}
+
+		const conteudo = resposta.choices?.[0]?.message?.content || "Sem resposta do modelo.";
+		res.json({ reply: conteudo });
+
+	} catch (err) {
+		console.error("Erro no /chat:", err);
+		res.status(500).json({ error: "Erro interno no servidor" });
+	}
 });
 
 
