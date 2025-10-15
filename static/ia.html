@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat com IA</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>Chat com IA</header>
+
+  <nav>
+    <a href="fichasADM.html">Fichas Publicas</a>
+    <a href="historiaADM.html">Editar Historia</a>
+    <a href="admin.html">Admin Panel</a>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <div id="ia-box" class="chat-box"></div>
+
+      <div class="chat-input">
+        <input type="text" id="ia-input" placeholder="Digite algo para a IA...">
+        <button id="ia-send-btn">Enviar</button>
+      </div>
+
+      <button id="logout-btn" style="margin-top: 10px;">Sair</button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="ia.js"></script>
+</body>
+</html>
