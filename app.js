@@ -339,12 +339,6 @@ app.get("/chat_history/:username", async (req, res) => {
   }
 });
 
-// por fim, seu server.listen(...)
-server.listen(PORT, () => {
-  console.log(`Servidor rodando na porta ${PORT}`);
-});
-
-
 // SocketIO
 io.on("connection", (socket) => {
   console.log("Cliente conectado");
