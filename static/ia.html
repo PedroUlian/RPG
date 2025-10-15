@@ -28,6 +28,25 @@
     </div>
   </div>
 
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const username = localStorage.getItem("username");
+      const isadmin = localStorage.getItem("isadmin");
+  
+      if (!username) {
+        window.location.href = "login.html";
+        return;
+      }
+  
+      // 🚫 bloqueia acesso se não for admin
+      if (isadmin !== "true") {
+        alert("Acesso restrito ao administrador.");
+        window.location.href = "index.html";
+        return;
+      }
+    });
+  </script>
+
   <script src="/socket.io/socket.io.js"></script>
   <script src="ia.js"></script>
 </body>
