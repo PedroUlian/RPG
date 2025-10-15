@@ -239,7 +239,7 @@ app.post("/chat", async (req, res) => {
 			messages: [
 				{ role: "user", content: "Você só responde em português brasileiro e de forma direta" },
 			],
-			model: "microsoft/DialoGPT-medium",
+			model: "microsoft/UserLM-8b",
 		});
 
 		if (resposta.error) {
