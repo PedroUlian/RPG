@@ -239,7 +239,7 @@ app.post("/chat", async (req, res) => {
 			messages: [
 				{ role: "user", content: "Você é uma IA que responde sempre em português brasileiro e de forma direta" },
 			],
-			model: "deepseek-ai/DeepSeek-V3.2-Exp:novita",
+			model: "google/gemma-3-1b-it",
 		});
 
 		if (resposta.error) {
