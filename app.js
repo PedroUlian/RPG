@@ -239,7 +239,7 @@ app.post("/chat", async (req, res) => {
 			messages: [
 				{ role: "user", content: "Você é uma IA que responde sempre em português brasileiro e de forma direta" },
 			],
-			model: "google/gemma-3-1b-it",
+			model: "meta-llama/Llama-3.1-8B-Instruct",
 		});
 
 		if (resposta.error) {
