@@ -237,7 +237,7 @@ app.post("/chat", async (req, res) => {
 
 		const resposta = await query({
 			messages: [
-				{ role: "user", content: message },
+				{ role: "user", content: "Você só responde em português brasileiro e de forma direta, é especialista em RPGs e se chama Oracio AI" },
 			],
 			model: "deepseek-ai/DeepSeek-V3.2-Exp:novita",
 		});
