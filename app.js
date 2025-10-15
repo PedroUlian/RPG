@@ -37,12 +37,35 @@ async function initDB() {
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
       username TEXT UNIQUE NOT NULL,
-      password TEXT NOT NULL
+      password TEXT NOT NULL,
+      isadmin BOOLEAN DEFAULT FALSE
     );
+
     CREATE TABLE IF NOT EXISTS messages (
       id SERIAL PRIMARY KEY,
       user_id INTEGER REFERENCES users(id),
       text TEXT NOT NULL,
+      timestamp TIMESTAMPTZ DEFAULT NOW()
+    );
+
+    CREATE TABLE IF NOT EXISTS character_sheet (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) UNIQUE,
+      nome TEXT, classe TEXT, raca TEXT, descricao TEXT,
+      nivel INTEGER DEFAULT 1, forca INTEGER DEFAULT 10, velocidade INTEGER DEFAULT 10,
+      inteligencia INTEGER DEFAULT 10, mana INTEGER DEFAULT 10
+    );
+
+    CREATE TABLE IF NOT EXISTS historia (
+      id INTEGER PRIMARY KEY DEFAULT 1,
+      conteudo TEXT
+    );
+
+    CREATE TABLE IF NOT EXISTS ai_messages (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id),
+      role VARCHAR(16) NOT NULL, -- 'user' ou 'assistant' (ou 'system' se quiser)
+      content TEXT NOT NULL,
       timestamp TIMESTAMPTZ DEFAULT NOW()
     );
   `);
@@ -227,36 +250,75 @@ async function query(data) {
 	return result;
 }
 
+// Limite de mensagens históricas a usar no contexto
+const AI_CONTEXT_LIMIT = 20;
+
 app.post("/chat", async (req, res) => {
-	try {
-		const { message } = req.body;
+  try {
+    const { message, username } = req.body;
 
-		if (!message) {
-			return res.status(400).json({ error: "Mensagem não fornecida" });
-		}
-  
-  let MsgFinal = "(responda de forma direta e em português) " + message
+    if (!message || !username) {
+      return res.status(400).json({ error: "username e message são necessários" });
+    }
 
-		const resposta = await query({
-			messages: [
-				{ role: "user", content: MsgFinal },
-			],
-			model: "meta-llama/Llama-3.1-8B-Instruct",
-		});
+    // encontrar user_id
+    const userResult = await pool.query("SELECT id FROM users WHERE username=$1", [username]);
+    if (userResult.rows.length === 0) {
+      return res.status(400).json({ error: "Usuário não encontrado" });
+    }
+    const user_id = userResult.rows[0].id;
 
-		if (resposta.error) {
-			console.error("Erro do modelo:", resposta.error);
-			return res.status(500).json({ error: resposta.error });
-		}
+    // buscar últimas N mensagens dessa pessoa (ordenadas asc para manter sequência)
+    const histRes = await pool.query(
+      `SELECT role, content FROM ai_messages WHERE user_id=$1 ORDER BY id DESC LIMIT $2`,
+      [user_id, AI_CONTEXT_LIMIT]
+    );
 
-		const conteudo = resposta.choices?.[0]?.message?.content || "Sem resposta do modelo.";
-		res.json({ reply: conteudo });
+    // histRes vem em ordem DESC; inverter para ASC
+    const history = histRes.rows.reverse().map(r => ({
+      role: r.role,
+      content: r.content
+    }));
 
-	} catch (err) {
-		console.error("Erro no /chat:", err);
-		res.status(500).json({ error: "Erro interno no servidor" });
-	}
+    // opcional: prompt de sistema para comportamento da IA
+    const systemPrompt = { role: "system", content: "Responda de forma direta e em português." };
+
+    // montar payload pro HF: system + histórico + nova msg do usuário
+    const messagesForModel = [systemPrompt, ...history, { role: "user", content: message }];
+
+    // salva a mensagem do usuário no banco (ai_messages)
+    await pool.query(
+      "INSERT INTO ai_messages (user_id, role, content) VALUES ($1, $2, $3)",
+      [user_id, "user", message]
+    );
+
+    // consulta ao modelo (reaproveitando sua função query)
+    const resposta = await query({
+      messages: messagesForModel,
+      model: "meta-llama/Llama-3.1-8B-Instruct",
+    });
+
+    if (resposta.error) {
+      console.error("Erro do modelo:", resposta.error);
+      return res.status(500).json({ error: resposta.error });
+    }
+
+    const conteudo = resposta.choices?.[0]?.message?.content || "Sem resposta do modelo.";
+
+    // salva resposta da IA no banco
+    await pool.query(
+      "INSERT INTO ai_messages (user_id, role, content) VALUES ($1, $2, $3)",
+      [user_id, "assistant", conteudo]
+    );
+
+    res.json({ reply: conteudo });
+
+  } catch (err) {
+    console.error("Erro no /chat:", err);
+    res.status(500).json({ error: "Erro interno no servidor" });
+  }
 });
+
 
 
 // SocketIO
