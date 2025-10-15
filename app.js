@@ -319,6 +319,30 @@ app.post("/chat", async (req, res) => {
   }
 });
 
+app.get("/chat_history/:username", async (req, res) => {
+  try {
+    const username = req.params.username;
+    const userResult = await pool.query("SELECT id FROM users WHERE username=$1", [username]);
+    if (userResult.rows.length === 0)
+      return res.status(400).json({ error: "Usuário não encontrado" });
+    const user_id = userResult.rows[0].id;
+
+    const hist = await pool.query(
+      "SELECT role, content, timestamp FROM ai_messages WHERE user_id=$1 ORDER BY id ASC LIMIT 200",
+      [user_id]
+    );
+
+    res.json(hist.rows);
+  } catch (err) {
+    console.error("Erro ao buscar histórico IA:", err);
+    res.status(500).json({ error: "Erro ao buscar histórico" });
+  }
+});
+
+// por fim, seu server.listen(...)
+server.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
 
 
 // SocketIO
