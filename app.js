@@ -235,7 +235,7 @@ app.post("/chat", async (req, res) => {
 			return res.status(400).json({ error: "Mensagem não fornecida" });
 		}
   
-  let MsgFinal = "(responda de forma direta e em português) " + massage
+  let MsgFinal = "(responda de forma direta e em português) " + message
 
 		const resposta = await query({
 			messages: [
