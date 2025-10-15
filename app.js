@@ -239,7 +239,7 @@ app.post("/chat", async (req, res) => {
 			messages: [
 				{ role: "user", content: "Você só responde em português brasileiro e de forma direta" },
 			],
-			model: "deepseek-ai/DeepSeek-V3.2-Exp",
+			model: "deepseek-ai/DeepSeek-V3.2-Exp:novita",
 		});
 
 		if (resposta.error) {
